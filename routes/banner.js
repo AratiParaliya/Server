@@ -1,10 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Banner = require("../models/banner");
-
-
-
-
+const mongoose = require("mongoose");
 
 const pLimit = require('p-limit');
 
