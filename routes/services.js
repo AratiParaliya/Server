@@ -19,6 +19,7 @@ router.post("/", async (req, res) => {
       icon,
       title,
       subtitle,
+      status: true, // ✅ NEW SERVICES ARE ACTIVE BY DEFAULT
       bg
     });
 
@@ -38,15 +39,37 @@ router.post("/", async (req, res) => {
   }
 });
 
-
-// ✅ GET ALL SERVICES
-router.get("/", async (req, res) => {
+router.get("/active", async (req, res) => {
   try {
-    const services = await Service.find().sort({ createdAt: -1 });
+    const services = await Service.find({ status: true });
 
     res.json({
       success: true,
       data: services
+    });
+
+  } catch (err) {
+    res.status(500).json({ success: false, msg: err.message });
+  }
+});
+// ✅ GET ALL SERVICES
+router.get("/", async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = 5;
+
+    const total = await Service.countDocuments();
+
+    const services = await Service.find()
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    res.json({
+      success: true,
+      data: services,
+      page,
+      totalPages: Math.ceil(total / limit)
     });
 
   } catch (err) {
