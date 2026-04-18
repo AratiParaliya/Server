@@ -9,46 +9,13 @@ const cloudinary = require('cloudinary').v2;
 const multer = require('multer');
 const path = require("path");
 
-cloudinary.config({
-  cloud_name: process.env.cloudinary_Config_cloud_name,
-  api_key: process.env.cloudinary_Config_api_key,
-  api_secret: process.env.cloudinary_Config_api_secret,
-});
 
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads");
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + "-" + file.originalname);
-  }
-});
 
 
-const upload = multer({ storage });
-router.post('/upload', upload.array("images"), async (req, res) => {
-  try {
-    console.log("FILES:", req.files); // 👈 MUST show array
 
-    if (!req.files || req.files.length === 0) {
-      return res.status(400).json({ msg: "No files uploaded" });
-    }
 
-    const images = req.files.map(file =>
-      `${req.protocol}://${req.get('host')}/uploads/${file.filename}`
-    );
 
-    return res.status(200).json({
-      success: true,
-      images
-    });
-
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({ error: error.message });
-  }
-});
 
 
 // ================= GET =================
@@ -141,45 +108,28 @@ router.put('/:id', async (req, res) => {
       images = [req.body.images];
     }
 
-    const uploadedImages = [];
-
-    for (let img of images) {
-
-      // if img is array take first value
-      if (Array.isArray(img)) {
-        img = img[0];
-      }
-
-      if (typeof img === "string" && img.startsWith("http")) {
-        uploadedImages.push(img);
-      } else {
-        const result = await cloudinary.uploader.upload(img);
-        uploadedImages.push(result.secure_url);
-      }
-
-    }
-
     const category = await Category.findByIdAndUpdate(
       req.params.id,
       {
         name: req.body.name,
-        images: uploadedImages,
+        images: images,   // ✅ DIRECT SAVE
         color: req.body.color
       },
       { new: true }
     );
 
-    res.json(category);
+    res.json({
+      success: true,
+      data: category
+    });
 
   } catch (error) {
-
     console.log("UPDATE ERROR:", error);
 
     res.status(500).json({
-      message: "Category update failed",
-      success: false
+      success: false,
+      message: "Category update failed"
     });
-
   }
 });
 
@@ -189,45 +139,29 @@ const pLimit = require('p-limit');
 router.post('/create', async (req, res) => {
   try {
 
-
     if (!req.body.images || req.body.images.length === 0) {
-      return res.status(400).json({ message: "No images provided" });
+      return res.status(400).json({
+        success: false,
+        message: "Images required"
+      });
     }
-    
-    const limit = pLimit(2);
-const imagesToUpload = req.body.images.map((image) => {
-  return limit(async () => {
-
-    // ✅ If already URL → don't upload again
-    if (typeof image === "string" && image.startsWith("http")) {
-      return { secure_url: image };
-    }
-
-    // ✅ Otherwise upload
-    const result = await cloudinary.uploader.upload(image);
-    return result;
-  });
-});
-    
-
-    const uploadStatus = await Promise.all(imagesToUpload);
-
-    const imgurl = uploadStatus.map(item => item.secure_url);
 
     const category = new Category({
       name: req.body.name,
-      images: imgurl,
+      images: req.body.images,   // ✅ DIRECT SAVE
       color: req.body.color
     });
 
     const savedCategory = await category.save();
 
-    res.status(201).json(savedCategory);
+    res.status(201).json({
+      success: true,
+      data: savedCategory
+    });
 
   } catch (error) {
-      console.log(error);
+    console.log(error);
     res.status(500).json({
-
       success: false,
       error: error.message
     });
