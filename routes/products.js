@@ -3,55 +3,11 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const { Product } = require('../models/product');
 const { Category } = require('../models/category');
-const multer = require('multer');
 
-const cloudinary = require('cloudinary').v2;
 const pLimit = require('p-limit');
 const { SubCategory } = require('../models/subcategory');
 
 const { Order } = require('../models/order');
-
-
-
-cloudinary.config({
-  cloud_name: process.env.cloudinary_Config_cloud_name,
-  api_key: process.env.cloudinary_Config_api_key,
-  api_secret: process.env.cloudinary_Config_api_secret,
-});
-
-
-
-
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads");
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + "-" + file.originalname);
-  }
-});
-
-
-const upload = multer({ storage });
-router.post('/upload', upload.array("images"), async (req, res) => {
-  try {
-    const imagesArr = [];
-
-    for (let file of req.files) {
-      const result = await cloudinary.uploader.upload(file.path);
-      imagesArr.push(result.secure_url);
-    }
-
-    res.status(200).json({
-      images: imagesArr
-    });
-
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-
 
 
 router.get('/', async (req, res) => {
