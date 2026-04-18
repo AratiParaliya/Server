@@ -6,7 +6,7 @@ const { Payment } = require("../models/payment");
 const Order = require("../models/order");
 // 🔐 Razorpay instance
 const razorpay = new Razorpay({
-  key_id: "rzp_test_SVXTx4nc4AWLH2",
+  key_id: "rzp_test_SeyW9kHlwo6iis",
   key_secret: "0JLjOga5bxzdIfUsde0WJfPW"
 });
 
