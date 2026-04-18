@@ -6,15 +6,8 @@ const { Product } = require('../models/product');
 const express = require('express');
 const router = express.Router();
 const cloudinary = require('cloudinary').v2;
-const multer = require('multer');
+
 const path = require("path");
-
-
-
-
-
-
-
 
 
 
