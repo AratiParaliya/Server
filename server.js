@@ -36,7 +36,9 @@ const receiptRoutes = require("./routes/receipt");
 const reviewsRoutes = require("./routes/Review");
 const bannerRoutes = require("./routes/banner")
 const uploadRoutes = require('./routes/upload');
+const serviceRoutes = require("./routes/services");
 
+app.use("/api/services", serviceRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use("/api/banner", bannerRoutes);
 app.use("/api/reviews",reviewsRoutes);
