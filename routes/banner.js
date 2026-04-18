@@ -3,37 +3,28 @@ const router = express.Router();
 const Banner = require("../models/banner");
 
 
-const multer = require("multer");
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads");
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + "-" + file.originalname);
-  }
-});
 
-const upload = multer({ storage });
+
 const pLimit = require('p-limit');
 
-module.exports = upload;
+
 // ✅ CREATE BANNER
 router.post("/", async (req, res) => {
   try {
-    if (!req.body.image) {
-      return res.status(400).json({
-        success: false,
-        msg: "Image required"
-      });
-    }
+  if (!req.body.images || req.body.images.length === 0) {
+  return res.status(400).json({
+    success: false,
+    msg: "Images required"
+  });
+}
 
  const banner = new Banner({
   title: req.body.title,
   desc: req.body.desc,
   type: req.body.type,   // ✅ ADD THIS
   status: req.body.status,
-  images: req.body.image
+  images: req.body.images
 });
 
     await banner.save();
@@ -52,30 +43,8 @@ router.post("/", async (req, res) => {
   }
 });
 
-// ✅ UPLOAD IMAGE ONLY
-router.post("/upload", upload.single("image"), (req, res) => {
-  try {
-    if (!req.file) {
-      return res.json({
-        success: false,
-        msg: "No file uploaded"
-      });
-    }
 
-    const imageUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
 
-    res.json({
-      success: true,
-      image: imageUrl   // ✅ SINGLE IMAGE
-    });
-
-  } catch (err) {
-    res.status(500).json({
-      success: false,
-      msg: err.message
-    });
-  }
-});
 // ✅ GET ALL BANNERS
 router.get("/", async (req, res) => {
   try {
@@ -148,7 +117,7 @@ const updateData = {
   desc: req.body.desc,
   type: req.body.type,   // ✅ ADD THIS
   status: req.body.status,
-  images: req.body.image
+  images: req.body.images
 };
 
     const banner = await Banner.findByIdAndUpdate(
