@@ -209,47 +209,44 @@ router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // ❌ USER NOT FOUND
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ error: true, msg: "User not found" });
     }
 
-    // ❌ GOOGLE USER TRYING PASSWORD LOGIN
-    if (user.loginType === "google") {
-      return res.status(400).json({ error: true, msg: "Please login with Google" });
+    // ❌ If no password → must use Google
+    if (!user.password) {
+      return res.status(400).json({
+        error: true,
+        msg: "Login with Google or set password"
+      });
     }
 
-    // ❌ PASSWORD NOT MATCH
     const isMatch = bcrypt.compareSync(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ error: true, msg: "Invalid credentials" });
     }
 
-    // ❌ BLOCKED USER
     if (user.status === "blocked") {
       return res.status(400).json({ error: true, msg: "Your account is blocked" });
     }
 
-    // ❌ NOT VERIFIED — must be checked BEFORE updating lastLogin
     if (!user.isVerified) {
       return res.status(400).json({ error: true, msg: "Email not verified" });
     }
 
-    // ✅ Update last login
     await User.findByIdAndUpdate(user._id, {
       status: "active",
       lastLogin: new Date()
     });
 
-    // ✅ TOKEN
     const token = jwt.sign(
       { userId: user._id, role: user.role },
       "SECRET_KEY",
       { expiresIn: '1d' }
     );
 
-    res.status(200).json({ success: true, token, user });
+    res.json({ success: true, token, user });
 
   } catch (error) {
     res.status(500).json({ error: true, msg: error.message });
