@@ -9,7 +9,7 @@ const Order = require("../models/order");
 // 🔐 Razorpay instance
 const razorpay = new Razorpay({
   key_id: "rzp_test_SeyW9kHlwo6iis",
-  key_secret: "0JLjOga5bxzdIfUsde0WJfPW"
+  key_secret: "e5qOjrpMdNVcHWffrc0dnDVQ"
 });
 
 
