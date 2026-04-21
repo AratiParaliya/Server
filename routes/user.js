@@ -73,7 +73,7 @@ router.post('/signup', async (req, res) => {
     const savedUser = await user.save();
 
     // ✅ EMAIL LINK
-   const verifyLink = `http://localhost:4000/api/user/verify-email/${verificationToken}`;
+   const verifyLink = `https://shopkartify.netlify.app/api/user/verify-email/${verificationToken}`;
    await transporter.sendMail({
   from: '"MyStore" <multimartwebapp@gmail.com>',
   to: savedUser.email,
@@ -273,7 +273,7 @@ router.post("/resend-verification", async (req, res) => {
     const verificationToken = crypto.randomBytes(32).toString("hex");
     await User.findByIdAndUpdate(user._id, { verificationToken });
 
-   const verifyLink = `http://localhost:4000/api/user/verify-email/${verificationToken}`;
+   const verifyLink = `https://shopkartify.netlify.app/api/user/verify-email/${verificationToken}`;
 
     await transporter.sendMail({
       from: "multimartwebapp@gmail.com",
@@ -306,7 +306,7 @@ router.get('/verify-email/:token', async (req, res) => {
     });
 
     if (!user) {
-      return  res.redirect(`http://localhost:3000/verify-status?error=invalid`);
+      return  res.redirect(`https://sh0pkart.netlify.app/verify-status?error=invalid`);
     }
 
     user.isVerified = true;
@@ -323,11 +323,11 @@ router.get('/verify-email/:token', async (req, res) => {
 
     // ✅ REDIRECT TO FRONTEND WITH TOKEN
    return res.redirect(
-  `http://localhost:3000/verify-status?token=${token}&userId=${user._id}`
+  `https://shopkartify.netlify.app/verify-status?token=${token}&userId=${user._id}`
 );
 
   } catch (error) {
-    res.redirect(`http://localhost:3000/verify-status?error=invalid`);
+    res.redirect(`https://shopkartify.netlify.app/verify-status?error=invalid`);
   }
 });
 router.get("/user-stats/:userId", async (req, res) => {
@@ -443,7 +443,7 @@ router.put('/:id', upload.single("image"), async (req, res) => {
 
     // ✅ ADD THIS (IMPORTANT)
     if (req.file) {
-  updateData.image = "http://localhost:4000/uploads/" + req.file.filename;
+  updateData.image = "https://shopkartify.netlify.app/uploads/" + req.file.filename;
 }
 
     // ✅ password update
