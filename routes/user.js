@@ -6,7 +6,7 @@ const { Order } = require("../models/order");
 const { Wishlist } = require("../models/wishlist");
 const { OAuth2Client } = require('google-auth-library');
 
-const client = new OAuth2Client("YOUR_GOOGLE_CLIENT_ID");
+const client = new OAuth2Client("162232767679-r2gieupemo5vstpksupm3dgf48tn0grj.apps.googleusercontent.com");
 
 
 const multer = require("multer");
